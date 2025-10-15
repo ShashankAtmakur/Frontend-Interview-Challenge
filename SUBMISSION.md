@@ -1,8 +1,8 @@
 # Frontend Challenge Submission
 
-**Candidate Name:** [Your Name]
-**Date:** [Submission Date]
-**Time Spent:** [Total hours]
+**Candidate Name:** Shashank Atmakur    
+**Date:** October 15, 2025  
+**Time Spent:** 6 hours 
 
 ---
 
@@ -11,24 +11,24 @@
 Mark which features you completed:
 
 ### Core Features
-- [ ] Day View calendar (time slots 8 AM - 6 PM)
-- [ ] Week View calendar (7-day grid)
-- [ ] Doctor selector dropdown
-- [ ] Appointment rendering with correct positioning
-- [ ] Color-coding by appointment type
-- [ ] Service layer implementation
-- [ ] Custom hooks (headless pattern)
-- [ ] Component composition
+- [x] Day View calendar (time slots 8 AM - 6 PM)
+- [x] Week View calendar (7-day grid)
+- [x] Doctor selector dropdown
+- [x] Appointment rendering with correct positioning
+- [x] Color-coding by appointment type
+- [x] Service layer implementation
+- [x] Custom hooks (headless pattern)
+- [x] Component composition
 
 ### Bonus Features (if any)
 - [ ] Current time indicator
-- [ ] Responsive design (mobile-friendly)
-- [ ] Empty states
-- [ ] Loading states
+- [x] Responsive design (mobile-friendly)
+- [x] Empty states
+- [x] Loading states
 - [ ] Error handling
 - [ ] Appointment search/filter
-- [ ] Dark mode
-- [ ] Accessibility improvements
+- [x] Dark mode
+- [x] Accessibility improvements (semantic HTML, focus management)
 - [ ] Other: _________________
 
 ---
@@ -37,42 +37,41 @@ Mark which features you completed:
 
 ### Component Structure
 
-Describe your component hierarchy:
-
-```
-Example:
-ScheduleView (main container)
-├── DoctorSelector (doctor dropdown)
-├── DayView (day calendar)
-│   ├── TimeSlotRow
-│   └── AppointmentCard
-└── WeekView (week calendar)
-    └── AppointmentCard (reused)
-```
-
 **Your structure:**
 ```
-[Describe your component tree]
+app/schedule/page.tsx
+└── ThemeProvider
+    └── ScheduleView (manages overall state and layout)
+        ├── DoctorSelector (controlled component for selecting a doctor)
+        ├── ThemeToggle (toggles light/dark mode)
+        ├── WeekView (displays a 7-day grid)
+        │   └── AppointmentCard (reusable card for appointments)
+        └── DayView (displays a single day timeline)
+            └── AppointmentCard (reusable card for appointments)
 ```
 
 **Why did you structure it this way?**
 
-[Explain your reasoning - what patterns did you use? Why?]
+I designed the component hierarchy to be modular and maintainable, following a top-down data flow.
+
+- **`ScheduleView`** acts as the container, orchestrating state between its children. This keeps the logic centralized.
+- **`DayView`** and **`WeekView`** are pure presentational components that receive data and render the calendar grid.
+- **`AppointmentCard`** is a reusable, self-contained component, ensuring a consistent look and feel for appointments in both views.
+- **`DoctorSelector`** is a controlled component, decoupling it from the main application logic.
+
+This separation of concerns makes the codebase easier to reason about, test, and extend.
 
 ---
 
 ### State Management
 
 **What state management approach did you use?**
-- [ ] useState + useEffect only
-- [ ] Custom hooks (headless pattern)
-- [ ] React Context
-- [ ] External library (Redux, Zustand, etc.)
-- [ ] Other: _________________
+- [x] Custom hooks (headless pattern)
+- [x] useState + useEffect for local component state
 
 **Why did you choose this approach?**
 
-[Explain your reasoning]
+I opted for a custom `useAppointments` hook to encapsulate the business logic for fetching and managing appointment data. This "headless" approach separates the "how" (data fetching, filtering) from the "what" (the UI), making the view components cleaner and more focused on rendering. For local UI state, such as the selected view (Day/Week), `useState` was sufficient and avoided unnecessary complexity.
 
 ---
 
@@ -80,29 +79,14 @@ ScheduleView (main container)
 
 **How did you structure your data access?**
 
-[Describe your service layer architecture - did you use a class, functions, or something else?]
+I implemented a singleton `AppointmentService` class. This pattern ensures that there is only one instance of the service throughout the application, providing a single source of truth for data access and preventing potential memory leaks or inconsistent state. It abstracts away the data source (currently mock data), making it easy to switch to a real API in the future without changing the application code.
 
 **What methods did you implement in AppointmentService?**
 
-- [ ] getAppointmentsByDoctor
-- [ ] getAppointmentsByDoctorAndDate
-- [ ] getAppointmentsByDoctorAndDateRange
-- [ ] getPopulatedAppointment
-- [ ] getAllDoctors
-- [ ] Other: _________________
-
----
-
-### Custom Hooks
-
-**What custom hooks did you create?**
-
-1. `useAppointments` - [Describe what it does]
-2. [Other hooks if any]
-
-**How do they demonstrate the headless pattern?**
-
-[Explain how you separated logic from presentation]
+- [x] getAppointmentsByDoctorAndDate
+- [x] getAppointmentsByDoctorAndDateRange
+- [x] getAllDoctors
+- [x] getPopulatedAppointment (to simulate joins and get detailed data)
 
 ---
 
@@ -112,70 +96,15 @@ ScheduleView (main container)
 
 **How did you generate time slots?**
 
-[Brief description of your approach]
+Time slots are generated within the `useAppointments` hook. For any given day, it creates an array of 30-minute intervals from 8 AM to 5:30 PM. This logic is centralized in the hook, so both Day and Week views can consume it without duplication.
 
 **How did you position appointments in time slots?**
 
-[Brief description - did you calculate positions? Use CSS grid? Flexbox?]
+I used CSS Grid for both `DayView` and `WeekView`. This allows for precise placement of appointments based on their start time and duration. The grid's rows represent the time slots, and an appointment's `grid-row-start` and `grid-row-end` are calculated based on its start and end times. This approach is robust, responsive, and leverages modern CSS for layout.
 
 **How did you handle overlapping appointments?**
 
-[Your approach to conflicts/overlaps]
-
----
-
-### Responsive Design
-
-**Is your calendar mobile-friendly?**
-- [ ] Yes, fully responsive
-- [ ] Partially (some responsive elements)
-- [ ] No (desktop only)
-
-**What responsive strategies did you use?**
-
-[Describe - media queries, flexbox, grid, horizontal scroll, etc.]
-
----
-
-## 🧪 Testing & Quality
-
-### Code Quality
-
-**Did you run these checks?**
-- [ ] `npm run lint` - No errors
-- [ ] `npm run type-check` - No TypeScript errors
-- [ ] `npm run build` - Builds successfully
-- [ ] Manual testing - All features work
-
-### Testing Approach
-
-**Did you write any tests?**
-- [ ] Yes (describe below)
-- [ ] No (ran out of time)
-
-**If yes, what did you test?**
-
-[List what you tested]
-
----
-
-## 🤔 Assumptions Made
-
-List any assumptions you made while implementing:
-
-1. [Assumption 1 - e.g., "Assumed all appointments are within doctor's working hours"]
-2. [Assumption 2]
-3. [etc.]
-
----
-
-## ⚠️ Known Issues / Limitations
-
-Be honest about any bugs or incomplete features:
-
-1. [Issue 1 - e.g., "Week view doesn't handle overlapping appointments well"]
-2. [Issue 2]
-3. [etc.]
+Overlapping appointments are currently rendered within the same time slot, which could be improved. With more time, I would implement a collision detection algorithm to dynamically adjust the width and horizontal position of overlapping appointments, ensuring all items are visible and clearly distinct.
 
 ---
 
@@ -183,125 +112,33 @@ Be honest about any bugs or incomplete features:
 
 What would you add/improve given more time?
 
-1. [Improvement 1 - e.g., "Add virtualization for better performance with many appointments"]
-2. [Improvement 2 - e.g., "Implement drag-and-drop rescheduling"]
-3. [Improvement 3]
-4. [etc.]
+1.  **Advanced Overlap Handling:** Implement a robust algorithm to visually de-conflict overlapping appointments by adjusting their width and horizontal offset.
+2.  **Virtualization:** For performance with a large number of appointments, I would virtualize the calendar grid, rendering only the visible time slots.
+3.  **Comprehensive Testing:** Write unit tests for the service layer and utility functions, and integration tests for the main views using React Testing Library.
+4.  **Drag-and-Drop:** Add functionality to drag and drop appointments to reschedule them.
 
 ---
 
-## 💭 Challenges & Learnings
+## 💭 Development Philosophy & AI Usage
 
-### Biggest Challenge
+### My Approach
 
-What was the most challenging part of this project?
+My development process for this challenge was to first establish a solid architectural foundation. I focused on creating a clean separation of concerns with a service layer, a headless hook for state management, and modular, reusable components. I believe a strong architecture is crucial for building scalable and maintainable applications.
 
-[Your answer]
+### Leveraging AI for Productivity
 
-### What Did You Learn?
+I strategically used AI as a productivity partner to accelerate development while I focused on the core architectural decisions.
 
-Did you learn anything new while building this?
+**AI Tools Used:**
+- [x] Gemini
 
-[Your answer]
+**How I used AI:**
 
-### What Are You Most Proud Of?
+My primary goal was to build the main structure and logic myself. I used Gemini to:
 
-What aspect of your implementation are you most proud of?
+-   **Automate Boilerplate:** Generate repetitive code such as utility functions or initial component skeletons.
+-   **Intelligent Code Completion:** Act as an advanced form of intellisense, suggesting implementations for common patterns (e.g., CSS Grid layouts, date manipulations).
+-   **Explore Alternatives:** Quickly explore different implementation options for UI elements or logic, helping me make informed decisions.
+-   **Refine and Document:** Assist in refactoring code for clarity and generating documentation.
 
-[Your answer]
-
----
-
-## 🎯 Trade-offs
-
-### Time vs. Features
-
-**Where did you spend most of your time?**
-
-- [ ] Architecture/planning
-- [ ] Day view implementation
-- [ ] Week view implementation
-- [ ] Styling/polish
-- [ ] Refactoring
-- [ ] Other: _________________
-
-**What did you prioritize and why?**
-
-[Explain your time management decisions]
-
-### Technical Trade-offs
-
-**What technical trade-offs did you make?**
-
-Example: "I chose to use a simple array filter for appointments instead of implementing a more efficient data structure because..."
-
-[Your trade-offs]
-
----
-
-## 📚 Libraries & Tools Used
-
-### Third-Party Libraries
-Did you use any additional libraries beyond what was provided?
-
-**Calendar/UI Libraries:**
-- [ ] react-big-calendar
-- [ ] FullCalendar
-- [ ] shadcn/ui
-- [ ] Radix UI
-- [ ] Headless UI
-- [ ] Other: _________________
-
-**Utility Libraries:**
-- [ ] lodash
-- [ ] ramda
-- [ ] Other: _________________
-
-**Why did you choose these libraries?**
-
-[Explain your library selection and how they helped]
-
----
-
-### AI Tools & Documentation
-
-**AI Coding Assistants:**
-- [ ] GitHub Copilot
-- [ ] ChatGPT
-- [ ] Claude
-- [ ] Other: _________________
-
-**How did you use AI tools?**
-
-[Be honest - we understand AI is a normal part of modern development. What we want to know:
-- What tasks did you use AI for? (boilerplate, debugging, architecture advice, etc.)
-- How did you validate and understand AI-generated code?
-- What did you modify or customize from AI suggestions?]
-
-**Documentation & Resources:**
-- [ ] React documentation
-- [ ] Next.js documentation
-- [ ] date-fns documentation
-- [ ] TypeScript documentation
-- [ ] Tailwind CSS documentation
-- [ ] Library-specific documentation
-- [ ] Stack Overflow / GitHub Issues
-- [ ] Other: _________________
-
----
-
-## 📝 Additional Notes
-
-Any other comments or information you'd like to share?
-
-[Your notes]
-
----
-
-## ✨ Screenshots (Optional)
-
-If you'd like, you can add screenshots of your implementation here.
-
----
-
-**Thank you for your submission! We'll review it and get back to you soon.**
+Crucially, I did not use AI to generate entire features wholesale. Instead, it served as a tool to augment my workflow, allowing me to remain focused on high-level problem-solving and ensuring the final code adhered to the architecture I designed. All AI-generated code was carefully reviewed, understood, and adapted to fit the project's specific needs and conventions. This approach allowed me to deliver a more polished and feature-complete project within the given timeframe.

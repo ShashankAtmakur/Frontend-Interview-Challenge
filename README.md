@@ -240,6 +240,9 @@ Follow this order:
 5. Implement `DoctorSelector.tsx` - Doctor filter
 6. Polish `ScheduleView.tsx` - Main composition
 
+Note: This repository has had the core files implemented to satisfy the
+challenge requirements (service, hook, selector, day/week views, and wiring).
+
 ---
 
 ## 📝 Submission Requirements
@@ -354,6 +357,60 @@ We understand AI tools are part of modern development. Feel free to use them! Wh
 - Accessibility improvements (ARIA labels, keyboard navigation)
 
 ---
+
+--- 
+
+## 🏛️ Architecture and Design Decisions
+
+My primary goal was to build a scalable and maintainable application by adhering to modern frontend architecture principles.
+
+### Core Architectural Patterns
+
+1.  **Separation of Concerns**: The application is divided into distinct layers:
+    *   **Service Layer (`services/`)**: A singleton `AppointmentService` class abstracts all data-sourcing logic. This makes the application independent of the data source, allowing for a seamless transition from mock data to a real API.
+    *   **Headless Logic (`hooks/`)**: The `useAppointments` custom hook contains all the business logic, state management, and data fetching orchestration. This separates the application's logic from the UI, making the components pure, testable, and reusable.
+    *   **UI Components (`components/`)**: All React components are responsible only for rendering the UI and capturing user events. They receive data and callbacks as props, making them presentational and easy to understand.
+
+2.  **Component-Based Architecture**: The UI is broken down into a hierarchy of reusable components.
+    *   **Container/View Components (`ScheduleView`, `DayView`, `WeekView`)**: These components manage the layout and composition of the UI.
+    *   **Pure/UI Components (`AppointmentCard`, `DoctorSelector`)**: These are small, reusable components that are used across different views.
+
+### Component Structure
+
+The component hierarchy is designed for clarity and reusability:
+
+```
+app/schedule/page.tsx
+└── ThemeProvider
+    └── ScheduleView (manages overall state and layout)
+        ├── DoctorSelector (controlled component for selecting a doctor)
+        ├── ThemeToggle (toggles light/dark mode)
+        ├── WeekView (displays a 7-day grid)
+        │   └── AppointmentCard (reusable card for appointments)
+        └── DayView (displays a single day timeline)
+            └── AppointmentCard (reusable card for appointments)
+```
+
+### Development Philosophy & AI Usage
+
+I believe in building a strong architectural foundation first. For this project, I personally designed the core structure, including the service layer, the headless hook, and the overall component design.
+
+To enhance productivity and focus on high-level tasks, I leveraged **Gemini** as an AI assistant. Its role was to automate boilerplate, provide intelligent code completion, and help refine UI implementations. This allowed me to accelerate the development process while ensuring that every piece of code was understood, reviewed, and integrated thoughtfully into the architecture I had designed.
+
+---
+
+## 💡 Trade-offs and Future Improvements
+
+Given the time constraints, I made the following trade-offs:
+
+*   **Prioritized Architecture over UI Polish**: I focused on creating a robust and scalable architecture. While the UI is functional and clean, more time could be spent on micro-interactions and animations.
+*   **Basic Overlap Handling**: The current implementation renders overlapping appointments, but does not dynamically adjust their width or position to prevent visual overlap. This was a trade-off to ensure the core functionality of rendering appointments in their correct time slots was solid.
+
+With more time, I would focus on:
+
+1.  **Advanced Overlap Handling**: Implement a collision detection algorithm to elegantly display overlapping appointments.
+2.  **Performance Optimization**: Virtualize the calendar grid to ensure high performance with a large number of appointments.
+3.  **Comprehensive Testing**: Add unit tests for services and hooks, and integration tests for the calendar views.
 
 ## 🤔 Questions?
 

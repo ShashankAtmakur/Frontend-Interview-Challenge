@@ -2,126 +2,155 @@
  * ScheduleView Component
  *
  * Main component that orchestrates the schedule display.
- * This component should compose smaller components together.
- *
- * TODO for candidates:
- * 1. Create the component structure (header, controls, calendar)
- * 2. Compose DoctorSelector, DayView, WeekView together
- * 3. Handle view switching (day vs week)
- * 4. Manage state or use the useAppointments hook
- * 5. Think about component composition and reusability
  */
 
 'use client';
 
-import { useState } from 'react';
-import type { CalendarView } from '@/types';
+import React, { useState } from 'react';
+import { startOfDay, startOfWeek, format, parse } from 'date-fns';
+import DoctorSelector from './DoctorSelector';
+import { DayView } from './DayView';
+import { WeekView } from './WeekView';
+import { appointmentService } from '../services/appointmentService';
+import { useTheme } from './ThemeProvider';
+import { ChevronLeft, ChevronRight, Sun, Moon } from './icons';
 
-// TODO: Import your components
-// import { DoctorSelector } from './DoctorSelector';
-// import { DayView } from './DayView';
-// import { WeekView } from './WeekView';
+export function ScheduleView() {
+  const doctors = appointmentService.getAllDoctors();
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string>(doctors[0]?.id ?? '');
+  const [view, setView] = useState<'day' | 'week'>('day');
+  const [date, setDate] = useState(new Date());
+  const [timeFormat, setTimeFormat] = useState<'12' | '24'>('24');
+  const { theme, toggleTheme } = useTheme();
 
-interface ScheduleViewProps {
-  selectedDoctorId: string;
-  selectedDate: Date;
-  view: CalendarView;
-  onDoctorChange: (doctorId: string) => void;
-  onDateChange: (date: Date) => void;
-  onViewChange: (view: CalendarView) => void;
-}
+  // navigation helpers
+  const goPrev = React.useCallback(() => setDate(d => {
+    const delta = view === 'day' ? 1 : 7;
+    const nd = new Date(d);
+    nd.setDate(nd.getDate() - delta);
+    return nd;
+  }), [view]);
+  const goNext = React.useCallback(() => setDate(d => {
+    const delta = view === 'day' ? 1 : 7;
+    const nd = new Date(d);
+    nd.setDate(nd.getDate() + delta);
+    return nd;
+  }), [view]);
+  const goToday = React.useCallback(() => {
+    const now = new Date();
+    const localStart = startOfDay(now);
+    if (view === 'week') {
+      const weekStart = startOfWeek(localStart, { weekStartsOn: 1 });
+      setDate(weekStart);
+    } else {
+      setDate(localStart);
+    }
+  }, [view]);
 
-/**
- * ScheduleView Component
- *
- * This is the main container component for the schedule interface.
- *
- * TODO: Implement this component
- *
- * Consider:
- * - How to structure the layout (header, controls, calendar)
- * - How to compose smaller components
- * - How to pass data down to child components
- * - How to handle user interactions (view switching, date changes)
- */
-export function ScheduleView({
-  selectedDoctorId,
-  selectedDate,
-  view,
-  onDoctorChange,
-  onDateChange,
-  onViewChange,
-}: ScheduleViewProps) {
-  // TODO: Use the useAppointments hook to fetch data
-  // const { appointments, doctor, loading, error } = useAppointments({
-  //   doctorId: selectedDoctorId,
-  //   date: selectedDate,
-  // });
+  // keyboard shortcuts: left/right for prev/next, 't' for today
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') goPrev();
+      if (e.key === 'ArrowRight') goNext();
+      if (e.key.toLowerCase() === 't') goToday();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [view, goPrev, goNext, goToday]);
+
+  const selectedDoctor = appointmentService.getDoctorById(selectedDoctorId);
 
   return (
-    <div className="bg-white rounded-lg shadow-lg">
-      {/* TODO: Implement the component structure */}
-
-      {/* Header with doctor info and controls */}
-      <div className="border-b border-gray-200 p-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Doctor Schedule</h2>
-            <p className="text-sm text-gray-600 mt-1">
-              TODO: Display doctor name and specialty
-            </p>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+      <header className="border-b border-gray-200 dark:border-gray-700 p-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-48">
+              <DoctorSelector value={selectedDoctorId} onChange={setSelectedDoctorId} />
+            </div>
+            <div className="flex items-center gap-2 rounded-lg bg-gray-100 dark:bg-gray-700 p-1">
+              <button 
+                className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" 
+                onClick={goPrev} 
+                aria-label="Previous"
+              >
+                <ChevronLeft className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              </button>
+              <button 
+                className="px-4 py-2 text-sm font-semibold rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200"
+                onClick={goToday} 
+                aria-label="Today"
+              >
+                Today
+              </button>
+              <button 
+                className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" 
+                onClick={goNext} 
+                aria-label="Next"
+              >
+                <ChevronRight className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              </button>
+            </div>
+            {view === 'day' && (
+              <input
+                type="date"
+                value={format(date, 'yyyy-MM-dd')}
+                onChange={(e) => {
+                  const parsed = parse(e.target.value, 'yyyy-MM-dd', new Date());
+                  setDate(startOfDay(parsed));
+                }}
+                className="px-3 py-2 border rounded-md bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+              />
+            )}
           </div>
 
-          <div className="flex gap-4">
-            {/* TODO: Add DoctorSelector component */}
-            <div className="text-sm text-gray-500">Doctor Selector</div>
-
-            {/* TODO: Add date picker */}
-            <div className="text-sm text-gray-500">Date Picker</div>
-
-            {/* TODO: Add view toggle buttons (Day/Week) */}
-            <div className="flex gap-2">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1 rounded-lg bg-secondary p-1">
               <button
-                className="px-4 py-2 text-sm bg-blue-600 text-white rounded"
-                onClick={() => onViewChange('day')}
+                className={`px-3 py-1 text-sm rounded-md ${view === 'day' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}
+                onClick={() => setView('day')}
               >
                 Day
               </button>
               <button
-                className="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded"
-                onClick={() => onViewChange('week')}
+                className={`px-3 py-1 text-sm rounded-md ${view === 'week' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}
+                onClick={() => setView('week')}
               >
                 Week
               </button>
             </div>
+            <div className="flex items-center gap-1 rounded-lg bg-secondary p-1">
+              <button
+                className={`px-3 py-1 text-sm rounded-md ${timeFormat === '12' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}
+                onClick={() => setTimeFormat('12')}
+                aria-pressed={timeFormat === '12'}
+              >
+                12h
+              </button>
+              <button
+                className={`px-3 py-1 text-sm rounded-md ${timeFormat === '24' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}
+                onClick={() => setTimeFormat('24')}
+                aria-pressed={timeFormat === '24'}
+              >
+                24h
+              </button>
+            </div>
+
           </div>
         </div>
-      </div>
-
-      {/* Calendar View */}
+      </header>
       <div className="p-6">
-        {/* TODO: Conditionally render DayView or WeekView based on view prop */}
-        <div className="text-center text-gray-500 py-12">
-          <p>Calendar View Goes Here</p>
-          <p className="text-sm mt-2">
-            Implement DayView and WeekView components and render based on selected view
-          </p>
-        </div>
-
-        {/* TODO: Uncomment when components are ready */}
-        {/* {view === 'day' ? (
-          <DayView
-            appointments={appointments}
-            doctor={doctor}
-            date={selectedDate}
-          />
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">{selectedDoctor?.name ?? 'Select a doctor'}</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{selectedDoctor?.specialty}</p>
+        {selectedDoctorId ? (
+          view === 'day' ? (
+            <DayView doctorId={selectedDoctorId} date={date} timeFormat={timeFormat} />
+          ) : (
+            <WeekView doctorId={selectedDoctorId} weekStart={date} timeFormat={timeFormat} />
+          )
         ) : (
-          <WeekView
-            appointments={appointments}
-            doctor={doctor}
-            weekStartDate={getWeekStart(selectedDate)}
-          />
-        )} */}
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">Please select a doctor to see their schedule.</div>
+        )}
       </div>
     </div>
   );
