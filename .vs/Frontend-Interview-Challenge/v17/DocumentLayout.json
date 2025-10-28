@@ -34,8 +34,12 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 3,
@@ -46,8 +50,7 @@
               "RelativeToolTip": "components\\ScheduleView.tsx",
               "ViewState": "AgIAADAAAAAAAAAAAAAewAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2025-10-14T18:08:03.439Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-14T18:08:03.439Z"
             },
             {
               "$type": "Document",
@@ -59,8 +62,7 @@
               "RelativeToolTip": "components\\WeekView.tsx",
               "ViewState": "AgIAADkAAAAAAAAAAAAUwEwAAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2025-10-14T18:07:44.176Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-14T18:07:44.176Z"
             },
             {
               "$type": "Document",
@@ -85,8 +87,7 @@
               "RelativeToolTip": "components\\DoctorSelector.tsx",
               "ViewState": "AgIAACkAAAAAAAAAAAAkwD4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2025-10-14T18:07:08.215Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-14T18:07:08.215Z"
             },
             {
               "$type": "Document",
@@ -98,12 +99,7 @@
               "RelativeToolTip": "hooks\\useAppointments.ts",
               "ViewState": "AgIAAFwAAAAAAAAAAAAewAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2025-10-14T18:06:47.746Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+              "WhenOpened": "2025-10-14T18:06:47.746Z"
             },
             {
               "$type": "Document",
@@ -115,8 +111,7 @@
               "RelativeToolTip": "README.md",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
-              "WhenOpened": "2025-10-14T17:57:40.721Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-14T17:57:40.721Z"
             }
           ]
         }
